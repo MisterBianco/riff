@@ -1,0 +1,20 @@
+# Jacobsin API Contract
+url:
+  https://jsonplaceholder.typicode.com/
+  
+endpoints: 
+  
+  todos/1:
+    method: "get"
+    code: 200
+    json: {"userId": 1,"id": 1,"title": "delectus aut autem","completed": false}
+
+  todos/2:
+    method: "get"
+    code: "OK"
+
+  posts:
+    method: "get"
+    code: "OK"
+    json: {[{}]}
+    
