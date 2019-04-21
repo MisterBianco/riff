@@ -1,63 +1,23 @@
-import re
-
-from typing import List, Dict
-
 from loguru import logger
 
-from riff.endpoint import Endpoint
-
-
-URL_REGEX = re.compile(
-    r"^(?:http|ftp)s?://"
-    r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"
-    r"localhost|"
-    r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
-    r"(?::\d+)?"
-    r"(?:/?|[/?]\S+)$",
-    re.IGNORECASE,
-)
-
-
-def validate_url(url: str) -> bool:
-    logger.info(f"Validating url: {url}")
-    if not re.match(URL_REGEX, url):
-        raise InvalidURLException(f"{url} is not a valid url")
-    return True
+from riff.parser import parse_rule
 
 
 class Contract:
-    def __init__(self, laws: dict) -> None:
-        self.url = None
-        self.endpoints = []
+    def __init__(self, rules: dict) -> None:
+        self.url = rules["url"]
 
-        self.parse(laws)
-        logger.info(f"Laws Parsed: {len(self.endpoints)}")
+        self.rules = {
+            k: parse_rule(v, self.url + k)
+            for (k, v) in rules["endpoints"].items()
+        }
+
+        logger.info(f"Rules Parsed: {len(self.rules)}")
+        logger.info(f"Contract Built\n")
 
     def __str__(self) -> str:
-        return f"Riff_Contract(url={self.url}, {self.endpoints})"
-
-    def parse(self, laws: dict) -> None:
-        self.url = laws["url"]
-        validate_url(self.url)
-
-        logger.info("Parsing Laws")
-
-        for key in laws["endpoints"].keys():
-
-            logger.debug(f"Parsing: {key}")
-
-            self.endpoints.append(
-                Endpoint(
-                    url=self.url + key,
-                    method=laws["endpoints"][key].get("method", None),
-                    code=laws["endpoints"][key].get("code", None),
-                    params=laws["endpoints"][key].get("params", None),
-                    headers=laws["endpoints"][key].get("headers", None),
-                    jsonobj=laws["endpoints"][key].get("json", None),
-                    textobj=laws["endpoints"][key].get("text", None),
-                )
-            )
+        return f"Riff_Contract(url={self.url}, {self.rules})"
 
     def run(self) -> None:
-        for endpoint in self.endpoints:
+        for endpoint in self.rules.values():
             endpoint.run()

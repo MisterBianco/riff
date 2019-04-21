@@ -45,7 +45,6 @@ jupyterlab = "^0.35.0"
 
 # Travis libs
 pre-commit = "^1.15.1"
-responses = "^0.10.6"
 
 [tool.poetry.scripts]
 riff = 'riff.__main__:execute_contract'
