@@ -2,6 +2,8 @@ import re
 
 from typing import List, Dict
 
+from loguru import logger
+
 from riff.endpoint import Endpoint
 
 
@@ -17,6 +19,7 @@ URL_REGEX = re.compile(
 
 
 def validate_url(url: str) -> bool:
+    logger.info(f"Validating url: {url}")
     if not re.match(URL_REGEX, url):
         raise InvalidURLException(f"{url} is not a valid url")
     return True
@@ -28,6 +31,7 @@ class Contract:
         self.endpoints = []
 
         self.parse(laws)
+        logger.info(f"Laws Parsed: {len(self.endpoints)}")
 
     def __str__(self) -> str:
         return f"Riff_Contract(url={self.url}, {self.endpoints})"
@@ -36,7 +40,12 @@ class Contract:
         self.url = laws["url"]
         validate_url(self.url)
 
+        logger.info("Parsing Laws")
+
         for key in laws["endpoints"].keys():
+
+            logger.debug(f"Parsing: {key}")
+
             self.endpoints.append(
                 Endpoint(
                     url=self.url + key,

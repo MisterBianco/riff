@@ -12,9 +12,4 @@ endpoints:
   todos/2:
     method: "get"
     code: "OK"
-
-  posts:
-    method: "get"
-    code: "OK"
-    json: {[{}]}
     
